@@ -1,0 +1,16 @@
+{
+  "launcher_version": "1.0.0",
+  "launcher_name": "AiCopilotDP",
+  "tools": [
+    {
+      "id": "fake_tool",
+      "display_name": "Fake Tool - Image Viewer",
+      "description": "Test tool: Image viewer with folder browsing capabilities",
+      "path": "G:/AIStudio/tools/FakeTool",
+      "entry_point": "main_gui.py",
+      "icon": "",
+      "category": "Testing",
+      "enabled": true
+    }
+  ]
+}

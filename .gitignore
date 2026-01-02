@@ -1,0 +1,64 @@
+# AiCopilotDP .gitignore
+# Prevents uploading large/sensitive files to GitHub
+
+# Virtual Environments
+.venv/
+**/.venv/
+venv/
+env/
+
+# Data (NOT tracked - too large)
+data/
+models/
+
+# Logs
+logs/
+*.log
+**/*_status.json
+
+# Python Cache
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Model Weights & Checkpoints
+*.pt
+*.pth
+*.bin
+*.ckpt
+*.h5
+*.pkl
+*.safetensors
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Jupyter Notebooks Checkpoints
+.ipynb_checkpoints/
+
+# Distribution / Packaging
+dist/
+build/
+*.egg-info/
+
+# Qt Designer Backups
+*.ui.bak
+
+# Test Coverage
+.coverage
+htmlcov/
+
+# Temporary Files
+*.tmp
+*.temp

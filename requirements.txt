@@ -1,0 +1,14 @@
+# AiCopilotDP Dependencies
+# Launcher only - NO AI libraries
+
+# GUI Framework (PySide6 - officially maintained by Qt)
+PySide6>=6.6.0
+
+# Markdown rendering for help viewer
+markdown>=3.5.0
+
+# Standard utilities (usually included, but explicit for AWS handoff)
+# No additional dependencies needed - uses standard library for:
+# - subprocess (process management)
+# - json (config handling)
+# - logging (status tracking)

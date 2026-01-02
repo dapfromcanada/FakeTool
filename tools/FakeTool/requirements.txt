@@ -1,0 +1,7 @@
+# GUI dependencies (NOT for AWS)
+PySide6>=6.6.0
+
+# Image processing dependencies (for AWS/CLI)
+Pillow>=10.0.0
+
+# Utilities
