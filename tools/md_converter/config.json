@@ -4,9 +4,10 @@
   "version": "1.0.0",
   "description": "Convert documents, images, and files to Markdown using AI-powered extraction",
   "paths": {
-    "input_folder": "",
+    "input_folder": "G:/AIStudio/data/raw/md_converter",
     "output_folder": "G:/AIStudio/data/processed/md_converter",
-    "logs": "logs/"
+    "logs": "logs/",
+    "models": "G:/AIStudio/models/md_converter"
   },
   "options": {
     "supported_formats": [

@@ -7,6 +7,7 @@ import argparse
 import logging
 import json
 import sys
+import signal
 from pathlib import Path
 from datetime import datetime
 import convert
@@ -18,6 +19,17 @@ class MDConverterEngine:
         self.config = self.load_config(config_path)
         self.setup_logging()
         self.status_file = Path(__file__).parent / "logs" / "md_converter_status.json"
+        self.shutdown_requested = False
+        
+        # Setup signal handlers for graceful shutdown
+        signal.signal(signal.SIGTERM, self.handle_shutdown)
+        signal.signal(signal.SIGINT, self.handle_shutdown)
+    
+    def handle_shutdown(self, signum, frame):
+        """Handle shutdown signals gracefully"""
+        self.logger.info(f"Received shutdown signal ({signum}), stopping gracefully...")
+        self.shutdown_requested = True
+        self.update_status("stopped", 0, "Stopped by signal")
         
     def load_config(self, config_path):
         """Load configuration from JSON file"""
@@ -107,12 +119,18 @@ class MDConverterEngine:
         # Convert each file
         successful = 0
         failed = 0
+        total = len(files)
         
         for i, file_path in enumerate(files, 1):
-            filename = Path(file_path).name
-            progress = int((i / len(files)) * 100)
+            # Check for shutdown request
+            if self.shutdown_requested:
+                self.logger.info("Shutdown requested, stopping conversion")
+                break
             
-            self.logger.info(f"[{i}/{len(files)}] {filename}")
+            filename = Path(file_path).name
+            progress = int((i / total) * 100)
+            
+            self.logger.info(f"[{i}/{total}] {filename}")
             self.update_status("running", progress, f"Converting {filename}")
             
             success, message, output_file = convert.convert_file(file_path, output_folder)

@@ -11,11 +11,11 @@ from pathlib import Path
 from datetime import datetime
 from PySide6.QtWidgets import (QApplication, QMainWindow, QFileDialog, QMessageBox,
                                QPushButton, QLineEdit, QListWidget, QPlainTextEdit,
-                               QProgressBar, QDialog, QVBoxLayout, QDialogButtonBox, QTextEdit)
+                               QProgressBar, QDialog, QVBoxLayout, QDialogButtonBox, QTextEdit,
+                               QToolBar)
 from PySide6.QtCore import QFile, QTimer, Qt
 from PySide6.QtUiTools import QUiLoader
 
-import convert
 import foldersandfiles
 
 
@@ -71,6 +71,9 @@ class MDConverterGUI(QMainWindow):
             self.setMenuBar(loaded_window.menuBar())
         if loaded_window.statusBar():
             self.setStatusBar(loaded_window.statusBar())
+        # Transfer any toolbars
+        for toolbar in loaded_window.findChildren(QToolBar):
+            self.addToolBar(toolbar)
         
         # Transfer central widget
         central = loaded_window.centralWidget()
@@ -203,7 +206,7 @@ class MDConverterGUI(QMainWindow):
         self.statusBar().showMessage(f"Ready - {count} files found", 2000)
     
     def on_convert_files(self):
-        """Handle convert files button - batch convert all files"""
+        """Handle convert files button - launch engine.py as subprocess"""
         if not self.input_folder or not self.output_folder:
             QMessageBox.warning(
                 self,
@@ -220,62 +223,94 @@ class MDConverterGUI(QMainWindow):
             )
             return
         
+        # Check if engine is already running
+        if self.engine_process and self.engine_process.poll() is None:
+            QMessageBox.warning(
+                self,
+                "Engine Running",
+                "Conversion is already in progress. Please wait for it to complete."
+            )
+            return
+        
         # Clear converted list
         self.lst_converted_files.clear()
         self.progress_bar.setValue(0)
         
-        total_files = self.lst_files_to_convert.count()
-        successful = 0
-        failed = 0
-        
         self.log_message("="*60)
-        self.log_message(f"Starting conversion of {total_files} file(s)")
+        self.log_message(f"Launching engine for folder conversion")
         
-        # Process each file
-        for i in range(total_files):
-            filename = self.lst_files_to_convert.item(i).text()
-            input_file = str(Path(self.input_folder) / filename)
+        # Launch engine.py as subprocess
+        try:
+            venv_python = Path(__file__).parent / ".venv" / "Scripts" / "python.exe"
+            engine_script = Path(__file__).parent / "engine.py"
             
-            # Update progress
-            progress = int(((i + 1) / total_files) * 100)
-            self.progress_bar.setValue(progress)
-            self.statusBar().showMessage(f"Converting {i + 1}/{total_files}: {filename}", 0)
-            QApplication.processEvents()  # Update UI
+            # Use venv python if available, otherwise system python
+            python_exe = str(venv_python) if venv_python.exists() else sys.executable
             
-            self.log_message(f"[{i + 1}/{total_files}] {filename}")
+            self.engine_process = subprocess.Popen(
+                [python_exe, str(engine_script), 
+                 "--config", str(self.config_path),
+                 "--folder", str(self.input_folder),
+                 "--output", str(self.output_folder)],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                bufsize=1
+            )
             
-            # Convert file
-            try:
-                success, message, output_file = convert.convert_file(input_file, self.output_folder)
-                
-                if success:
-                    successful += 1
-                    output_filename = Path(output_file).name
-                    self.lst_converted_files.addItem(output_filename)
-                    self.log_message(f"  ✓ {message}")
-                else:
-                    failed += 1
-                    self.log_message(f"  ✗ {message}")
-            except Exception as e:
-                failed += 1
-                self.log_message(f"  ✗ Exception: {str(e)}")
-        
-        # Final status
-        final_msg = f"Conversion complete: {successful} successful, {failed} failed"
-        self.log_message("="*60)
-        self.log_message(final_msg)
-        self.statusBar().showMessage(final_msg, 5000)
-        
-        # Show completion message
-        QMessageBox.information(
-            self,
-            "Conversion Complete",
-            f"Converted {successful} file(s) successfully.\n{failed} file(s) failed."
-        )
+            # Start monitoring status
+            self.status_timer.start(500)  # Check every 500ms
+            self.log_message("Engine started - monitoring progress...")
+            self.statusBar().showMessage("Converting files...", 0)
+            
+        except Exception as e:
+            self.log_message(f"✗ Failed to launch engine: {str(e)}")
+            QMessageBox.critical(
+                self,
+                "Engine Error",
+                f"Failed to start conversion engine:\n{str(e)}"
+            )
     
     def check_status(self):
         """Check engine status from JSON file (for subprocess monitoring)"""
         try:
+            # Check if engine process is still running
+            if self.engine_process:
+                poll_result = self.engine_process.poll()
+                
+                if poll_result is not None:
+                    # Process finished
+                    self.status_timer.stop()
+                    
+                    # Read final output
+                    stdout, stderr = self.engine_process.communicate()
+                    if stdout:
+                        for line in stdout.strip().split('\n'):
+                            if line:
+                                self.log_message(line)
+                    if stderr:
+                        for line in stderr.strip().split('\n'):
+                            if line:
+                                self.log_message(f"Error: {line}")
+                    
+                    # Refresh the converted files list
+                    self.refresh_converted_files()
+                    
+                    if poll_result == 0:
+                        self.log_message("="*60)
+                        self.log_message("Conversion completed successfully")
+                        self.statusBar().showMessage("Conversion complete", 5000)
+                        QMessageBox.information(self, "Complete", "Conversion finished successfully!")
+                    else:
+                        self.log_message("="*60)
+                        self.log_message(f"Conversion failed with exit code {poll_result}")
+                        self.statusBar().showMessage("Conversion failed", 5000)
+                        QMessageBox.warning(self, "Failed", f"Conversion failed. Check logs for details.")
+                    
+                    self.engine_process = None
+                    return
+            
+            # Read status file for progress updates
             if self.status_file.exists():
                 with open(self.status_file, 'r') as f:
                     status = json.load(f)
@@ -283,8 +318,17 @@ class MDConverterGUI(QMainWindow):
                     progress = status.get('progress', 0)
                     self.progress_bar.setValue(progress)
                     self.statusBar().showMessage(f"Engine: {message}", 0)
-        except Exception:
+        except Exception as e:
             pass  # Silent fail for status checks
+    
+    def refresh_converted_files(self):
+        """Refresh the list of converted files in output folder"""
+        self.lst_converted_files.clear()
+        if self.output_folder and Path(self.output_folder).exists():
+            output_path = Path(self.output_folder)
+            md_files = sorted(output_path.glob("*.md"))
+            for md_file in md_files:
+                self.lst_converted_files.addItem(md_file.name)
     
     def on_help_clicked(self):
         """Open help documentation viewer"""
