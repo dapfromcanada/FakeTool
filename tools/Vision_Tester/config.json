@@ -1,0 +1,20 @@
+{
+  "tool_name": "vision_tester",
+  "version": "1.0.0",
+  "description": "YOLO Object Detection Testing Tool",
+  "paths": {
+    "raw_data": "G:/AI_STUDIO/data/raw/vision_tester",
+    "processed_data": "G:/AI_STUDIO/data/processed/vision_tester",
+    "model_output": "G:/AI_STUDIO/models/vision_tester/exports"
+  },
+  "model": {
+    "name": "yolo11x.pt",
+    "confidence_threshold": 0.25,
+    "filter_classes": null
+  },
+  "options": {
+    "save_detections_txt": false,
+    "enable_logging": true,
+    "log_level": "INFO"
+  }
+}
