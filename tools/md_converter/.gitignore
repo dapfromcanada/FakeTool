@@ -20,8 +20,10 @@ logs/
 # Settings (may contain user paths)
 settings.ini
 
-# Converted files (output)
+# Converted files (output) - but NOT documentation
 *.md
+!docs/*.md
+!README.md
 
 # IDE
 .vscode/
