@@ -2,6 +2,27 @@
 
 ## 🎯 Project: AI Studio - Modular AI Development Suite
 
+---
+
+## 📋 GitHub Access Information
+
+**Repository Owner:** `dapfromcanada`  
+**Main Repository:** `https://github.com/dapfromcanada/AIStudio`  
+**All Repos Public:** Yes - anyone can clone without authentication
+
+### For Copilot/AI Assistant Access:
+- **VS Code GitHub Login:** User is logged into GitHub in VS Code
+- **Copilot can access:** Public repo metadata, issues, code through GitHub API
+- **Other repos:** All public at `https://github.com/dapfromcanada`
+
+### To Clone This Project:
+```bash
+git clone https://github.com/dapfromcanada/AIStudio.git
+cd AIStudio
+```
+
+---
+
 ### What We've Accomplished:
 
 #### 1. Master Blueprint Created ✅
