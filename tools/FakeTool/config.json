@@ -1,0 +1,23 @@
+{
+  "tool_name": "fake_tool",
+  "display_name": "Fake Tool",
+  "version": "1.0.0",
+  "description": "Image viewer tool for testing template and launcher system",
+  "paths": {
+    "raw_data": "G:/AIStudio/data/raw/fake_tool",
+    "processed_data": "G:/AIStudio/data/processed/fake_tool",
+    "model_output": "G:/AIStudio/models/fake_tool/exports",
+    "logs": "logs/"
+  },
+  "options": {
+    "supported_formats": ["jpg", "jpeg", "png", "bmp", "gif", "tiff", "webp"],
+    "enable_logging": true,
+    "auto_scale_images": true,
+    "max_image_size_mb": 50
+  },
+  "gui_settings": {
+    "window_width": 900,
+    "window_height": 700,
+    "default_folder": ""
+  }
+}
