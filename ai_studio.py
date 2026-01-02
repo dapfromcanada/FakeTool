@@ -1,5 +1,5 @@
 """
-AiCopilotDP - AI Studio Master Controller
+AIStudio - AI Development Tools Launcher
 A lightweight launcher for managing AI development tools.
 
 Purpose: Launch, monitor, and manage independent AI tool processes.
@@ -15,7 +15,7 @@ from PySide6.QtCore import QProcess, QFile, Qt
 from PySide6.QtUiTools import QUiLoader
 
 
-class AiCopilotDP(QMainWindow):
+class AIStudio(QMainWindow):
     """Main controller window for AI Studio tools."""
     
     def __init__(self):
@@ -45,7 +45,7 @@ class AiCopilotDP(QMainWindow):
     
     def load_ui(self):
         """Load the UI file created in Qt Designer."""
-        ui_path = self.base_path / "aicopilot_dp.ui"
+        ui_path = self.base_path / "ai_studio.ui"
         if ui_path.exists():
             ui_file = QFile(str(ui_path))
             ui_file.open(QFile.ReadOnly)
@@ -68,12 +68,12 @@ class AiCopilotDP(QMainWindow):
             self.txt_tool_info = central.findChild(QTextEdit, "txt_tool_info")
         else:
             # Placeholder until UI is created
-            self.setWindowTitle("AiCopilotDP - UI Not Found")
+            self.setWindowTitle("AIStudio - UI Not Found")
             self.resize(800, 600)
     
     def setup_window(self):
         """Configure main window properties."""
-        self.setWindowTitle(f"AiCopilotDP v{self.config.get('launcher_version', '1.0.0')}")
+        self.setWindowTitle(f"AIStudio v{self.config.get('launcher_version', '1.0.0')}")
         
     def connect_signals(self):
         """Connect UI widgets to handlers (after UI is created)."""
@@ -259,7 +259,7 @@ class HelpViewer(QDialog):
     
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("AiCopilotDP Help")
+        self.setWindowTitle("AIStudio Help")
         self.resize(950, 750)
         
         # Create layout
@@ -466,12 +466,12 @@ class HelpViewer(QDialog):
 
 
 def main():
-    """Entry point for AiCopilotDP."""
+    """Entry point for AIStudio."""
     app = QApplication(sys.argv)
-    app.setApplicationName("AiCopilotDP")
+    app.setApplicationName("AIStudio")
     app.setOrganizationName("AI Studio")
     
-    launcher = AiCopilotDP()
+    launcher = AIStudio()
     launcher.show()
     
     sys.exit(app.exec())

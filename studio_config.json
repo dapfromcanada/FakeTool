@@ -1,6 +1,6 @@
 {
   "launcher_version": "1.0.0",
-  "launcher_name": "AiCopilotDP",
+  "launcher_name": "AIStudio",
   "tools": [
     {
       "id": "fake_tool",
