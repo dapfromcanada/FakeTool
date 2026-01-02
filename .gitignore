@@ -1,5 +1,9 @@
-# AiCopilotDP .gitignore
+# AIStudio .gitignore
 # Prevents uploading large/sensitive files to GitHub
+
+# Tools (each tool is a separate repo)
+tools/*/
+!tools/tools_template/
 
 # Virtual Environments
 .venv/
